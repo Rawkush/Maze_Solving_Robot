@@ -1,27 +1,32 @@
+
+const int triggerL = 2; //left
+const int echoL = 3; // left
+const int triggerM = 4; //middle
+const int echoM = 5;// middle
+const int triggerR = 6; //Right
+const int echoR = 7;//  Right
+
+const int volt=8; // for sensor 
+int vo=13;
 const int lMotFwd=9; 
 const int rMotFwd=10;
 const int lMotRev=11;
 const int rMotRev=12; 
 
-const int volt=8;
-const int triggerL = 2; //Trigger pin of LEFT Sesnor
-const int echoL = 3; //Echo pin of 1st Sesnor
-const int triggerM = 4; //Trigger pin of MIDDLE Sesnor
-const int echoM = 5;//Echo pin of 2nd Sesnor
-const int triggerR = 6; //Trigger pin of RIGHT Sesnor
-const int echoR = 7; //Echo pin of 1st Sesnor
+const int criticalDistance=10; //critical distance
+const int touch=5;
 
+long time_taken;
+long distM,distL,distR;
 
-const int criticalDistance = 100;  // distance that tell there is a wall
-int leftDistance;
-int rightDistance;
-int forwardDistance;
+ 
 
 void setup() {
 Serial.begin(9600); 
 pinMode(triggerL, OUTPUT); 
 pinMode(echoL, INPUT); 
 pinMode(volt,OUTPUT);
+pinMode(vo,OUTPUT);
 pinMode(triggerM, OUTPUT); 
 pinMode(echoM, INPUT);
 pinMode(triggerR, OUTPUT); 
@@ -37,25 +42,53 @@ pinMode(echoR, INPUT);
 
 }
 
+/*###Function to calculate distance###*/
+int calculate_distance(int trigger, int echo)
+{
+digitalWrite(trigger, LOW);
+delayMicroseconds(2);
+digitalWrite(trigger, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigger, LOW);
 
+time_taken = pulseIn(echo, HIGH);
+int dist= time_taken*0.034/2;
+return dist;
+}
+
+
+
+void reverse()
+{
+  digitalWrite(lMotRev,HIGH);
+  digitalWrite(rMotRev,HIGH);
+  
+}
 void moveForward()
 {
   digitalWrite(lMotFwd,HIGH);
   digitalWrite(rMotFwd,HIGH);
+  
+digitalWrite(lMotRev,LOW);
+digitalWrite(rMotRev,LOW);
 }
 
 void turnLeft()
 {
   digitalWrite(lMotFwd,LOW);
   digitalWrite(rMotFwd,HIGH);
+  
+digitalWrite(lMotRev,LOW);
+digitalWrite(rMotRev,LOW);
 }
 
 
 void turnRight()
 {
   digitalWrite(lMotFwd,HIGH);
-  digitalWrite(rMotFwd,LOW);
-}
+digitalWrite(rMotFwd,LOW);
+digitalWrite(lMotRev,LOW);
+digitalWrite(rMotRev,LOW);}
 
 void turnCircle()
 {
@@ -77,30 +110,63 @@ digitalWrite(rMotRev,LOW);
 
 
 
-/*###Function to calculate distance###*/ 
-int calculate_distance(int trigger, int echo)
-{
-digitalWrite(trigger, LOW);
-delayMicroseconds(2);
-digitalWrite(trigger, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigger, LOW);
-int time_taken = pulseIn(echo, HIGH);
-int dist= time_taken*0.034/2;
-return dist;
-}
 
-void loop() {
+
+
+
+
+
+
+
+void loop(){
+
+digitalWrite(8,HIGH); // volatege to sensor
+digitalWrite(vo,HIGH); // volatege to sensor
+
+
+distL= calculate_distance(triggerL,echoL);
+Serial.print(distL);
+ 
+distM= calculate_distance(triggerM,echoM);
+Serial.print("\t");
+ Serial.print(distM);
+distR= calculate_distance(triggerR,echoR);
+Serial.print("\t");
+ Serial.println(distR);
+
+
+ if(distM>12){
+  moveForward();
+ }else{
+
+  if(distM<12){
+
+    if(distL>12){
+      turnLeft();
+    }else{
+      if(distR>12){
+        turnRight();
+      }else{
+
+
+
+        if(distL<12&&distR<12){
+          turnCircle();
+        }
+      }
+
+      
+    }
+
+      
+
+
+    
+  }
+
   
-  // put your main code here, to run repeatedly:
-  
-  leftDistance=calculate_distance(triggerL,echoL);
-  rightDistance=calculate_distance(triggerR,echoR);
-  forwardDistance=calculate_distance(triggerM,echoM);
-  Serial.print(leftDistance);
-  Serial.print("\t"); 
-  Serial.print(leftDistance); 
-  Serial.print("\t");
-  Serial.println(leftDistance); 
+ }
+
+ 
 
 }
