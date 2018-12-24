@@ -135,22 +135,25 @@ Serial.print("\t");
  Serial.println(distR);
 
 
- if(distM>12){
+ if(distM>16){
   moveForward();
  }else{
 
-  if(distM<12){
 
-    if(distL>12){
+  if(distM<8){
+    reverse();
+  }else
+
+  if(distM>8&&distM<16){
+
+    if(distL>16){
       turnLeft();
     }else{
-      if(distR>12){
+      if(distR>16){
         turnRight();
       }else{
 
-
-
-        if(distL<12&&distR<12){
+       if(distL<16&&distR<16){
           turnCircle();
         }
       }

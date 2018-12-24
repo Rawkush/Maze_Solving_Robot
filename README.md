@@ -1,2 +1,2 @@
-# Maze_Solving_Robot
-Code for Maze solving robot (using the Ultrasonic sensors)
+# Object Avoiding RObot
+Code For Object Avoiding robot using Ultrasonic sensors
